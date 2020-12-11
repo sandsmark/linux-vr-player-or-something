@@ -17,3 +17,8 @@ Dependencies:
     - openhmd
     - qt
     - c++ compiler
+
+Example
+-------
+
+qmake && make && ./ohmdplayer https://www.youtube.com/watch?v=dUG5jURDWXQ
