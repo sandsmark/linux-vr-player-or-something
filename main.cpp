@@ -44,6 +44,6 @@ int main(int argc, char *argv[])
     MpvWidget w;
     w.videoAngle = videoAngle;
     w.show();
-    w.play(path);
+    //w.play(path);
     return a.exec();
 }

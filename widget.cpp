@@ -1,6 +1,12 @@
 ﻿#include "widget.h"
 
+#include <X11/extensions/Xrandr.h>
+#include "fixx11h.h"
+
+#include <QX11Info>
+
 #include "ohmdhandler.h"
+
 
 #include <stdexcept>
 #include <QOpenGLContext>
@@ -10,6 +16,7 @@
 #include <QStandardPaths>
 #include <QPainter>
 #include <QScreen>
+#include <QX11Info>
 #include <QApplication>
 #include <QTime>
 #include <QKeyEvent>
@@ -159,13 +166,136 @@ static const GLfloat g_vertex_buffer_data[] = {
 };
 static const GLushort g_element_buffer_data[] = { 0, 1, 2, 3 };
 
+static void xrandrStuff()
+{
+}
+
+static double
+mode_refresh (const XRRModeInfo *mode_info)
+{
+    double rate;
+    double vTotal = mode_info->vTotal;
+
+    if (mode_info->modeFlags & RR_DoubleScan) {
+	/* doublescan doubles the number of lines */
+	vTotal *= 2;
+    }
+
+    if (mode_info->modeFlags & RR_Interlace) {
+	/* interlace splits the frame into two fields */
+	/* the field rate is what is typically reported by monitors */
+	vTotal /= 2;
+    }
+
+    if (mode_info->hTotal && vTotal)
+	rate = ((double) mode_info->dotClock /
+		((double) mode_info->hTotal * (double) vTotal));
+    else
+    	rate = 0;
+    return rate;
+}
+
+
+
 void MpvWidget::initializeGL()
 {
-    //initializeOpenGLFunctions();
-
+    QString outputName;
     for (const QScreen *screen : qApp->screens()) {
+        qDebug() << screen->model() << screen->manufacturer() << screen->name();
+        //if (screen->model().contains("oculus", Qt::CaseInsensitive) || screen->manufacturer().contains("oculus", Qt::CaseInsensitive)) {
+            outputName = screen->name();
+            break;
+        //}
         qDebug() << "during init" << screen->refreshRate() << screen->size();
     }
+    RROutput primaryOutput = XRRGetOutputPrimary(QX11Info::display(), winId());
+    qDebug() << "primary output" << primaryOutput;
+    qDebug() << "winid" << winId();
+    XRRScreenResources *resources = XRRGetScreenResources(QX11Info::display(), winId());
+    XRROutputInfo *outputInfo = nullptr;
+    for (int output=0; output<resources->noutput; output++) {
+        outputInfo = XRRGetOutputInfo (QX11Info::display(), resources, resources->outputs[output]);
+        QString name = QString::fromLocal8Bit(outputInfo->name, outputInfo->nameLen);
+        if (name == outputName) {
+            qDebug() << "output id:" << resources->outputs[output];
+            break;
+        }
+        XRRFreeOutputInfo(outputInfo);
+        outputInfo = nullptr;
+    }
+    if (!outputInfo) {
+        qWarning() << "Did not find" << outputName;
+    }
+    XRROutputInfo *oi = outputInfo;
+    if (oi) {
+        qDebug() << oi->npreferred << oi->nmode << resources->nmode << resources->ncrtc << resources->noutput;
+        qDebug() << oi->ncrtc;
+        if (oi->nameLen) {
+            qDebug() << oi->name;
+        }
+
+        {
+            XRROutputInfo   *output_info = oi;
+            int		    m;
+            XRRModeInfo	    *best = NULL;
+            int		    bestDist;
+
+            best = NULL;
+            bestDist = 0;
+            double bestRefresh = 0;
+            qDebug() << "modes:" << output_info->nmode;
+            for (m = 0; m < output_info->nmode; m++)
+            {
+                XRRModeInfo *mode_info = nullptr; //find_mode_by_xid (output_info->modes[m]);
+                for (int mi =0; mi<resources->nmode; mi++) {
+                    if (resources->modes[mi].id == output_info->modes[m]) {
+                        mode_info = &resources->modes[mi];
+                        break;
+                    }
+                }
+                if (!mode_info) {
+                    qWarning() << "did not find mode_inof";
+                    continue;
+                }
+                int	    dist;
+
+                //if (m < output_info->npreferred) {
+                //    dist = 0;
+                //    qDebug() << "is preferred";
+                /*} else*/ if (output_info->mm_height) {
+                    dist = (1000 * DisplayHeight(QX11Info::display(), QX11Info::appScreen()) / DisplayHeightMM(QX11Info::display(), QX11Info::appScreen()) -
+                            1000 * mode_info->height / output_info->mm_height);
+                    qDebug() << "mm height:" << output_info->mm_height << dist;
+                } else {
+                    dist = DisplayHeight(QX11Info::display(), QX11Info::appScreen()) - mode_info->height;
+                    qDebug() << "dist:" << dist;
+                }
+                qDebug() << mode_refresh(mode_info);
+
+                if (dist < 0) dist = -dist;
+                if (!best || dist < bestDist || mode_refresh(mode_info) > bestRefresh)
+                {
+                    qDebug() << bestRefresh;
+                    best = mode_info;
+                    bestDist = dist;
+                    bestRefresh = mode_refresh(mode_info);
+                }
+            }
+            if (best) {
+                qDebug() << "best dist" << bestDist << best->width << best->height;
+                qDebug() << mode_refresh(best);
+                XRRCrtcInfo *crtc = XRRGetCrtcInfo(QX11Info::display(), resources, oi->crtc);
+                // XRRSetCrtcConfig(QX11Info::display(), resources, oi->crtc, CurrentTime, crtc->x, crtc->y, best->id, crtc->rotation, crtc->outputs, crtc->noutputs);
+                qDebug() << crtc->x << crtc->y << crtc->width << crtc->height;
+                XRRFreeCrtcInfo(crtc);
+            }
+        }
+    }
+    XRRFreeOutputInfo(oi);
+    XRRFreeScreenResources(resources);
+
+    //initializeOpenGLFunctions();
+
     /* Sphere shader */
     m_sphereShader = new QOpenGLShaderProgram(this);
 //    m_sphereShader->addShaderFromSourceCode(QOpenGLShader::Vertex, m_ohmd->distortionVertShader);
@@ -387,6 +517,7 @@ void MpvWidget::onScreenAdded()
     }
 
     for (QScreen *other : qApp->screens()) {
+        qDebug() << other->model() << other->manufacturer();
         if (other == screen()) {
             continue;
         }
