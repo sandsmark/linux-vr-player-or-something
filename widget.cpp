@@ -123,7 +123,6 @@ MpvWidget::MpvWidget() :
     mpv_set_wakeup_callback(m_mpv, wakeup, this);
 
     m_ohmd = new OhmdHandler(this);
-    m_ohmd->start();
 
     connect(qGuiApp, &QGuiApplication::screenAdded, this, &MpvWidget::onScreenAdded);
 }
@@ -263,6 +262,8 @@ void MpvWidget::paintGL()
     };
     mpv_render_context_render(m_mpvGl, params);
 
+
+    m_ohmd->update();
 
     makeCurrent();
     glClear(GL_COLOR_BUFFER_BIT);

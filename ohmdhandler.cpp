@@ -3,9 +3,7 @@
 #include <openhmd.h>
 #include <QDebug>
 
-OhmdHandler::OhmdHandler(QObject *parent) : QThread(parent),
-    isRunning(true),
-    m_modelViewMatrices(4)
+OhmdHandler::OhmdHandler(QObject *parent) : QObject(parent)
 {
 //    m_modelViewMatrices.first.setToIdentity();
 //    m_modelViewMatrices.second.setToIdentity();
@@ -16,8 +14,6 @@ OhmdHandler::OhmdHandler(QObject *parent) : QThread(parent),
 OhmdHandler::~OhmdHandler()
 {
     isRunning = false;
-    m_waitCondition.notify_all();
-    wait();
 }
 
 bool OhmdHandler::init()
@@ -112,41 +108,28 @@ bool OhmdHandler::init()
     return true;
 }
 
-QVector<QMatrix4x4> OhmdHandler::modelViewMatrices()
-{
-    m_mutex.lock();
-    QVector<QMatrix4x4> ret = m_modelViewMatrices;
-    m_mutex.unlock();
-    m_waitCondition.notify_all();
-    return ret;
-}
-
-void OhmdHandler::run()
+void OhmdHandler::update()
 {
 
-
-    while (isRunning) {
         ohmd_ctx_update(m_ohmdContext);
-        float leftMvMatrix[16];
-        ohmd_device_getf(m_ohmdDevice, OHMD_LEFT_EYE_GL_MODELVIEW_MATRIX, leftMvMatrix);
-        float rightMvMatrix[16];
-        ohmd_device_getf(m_ohmdDevice, OHMD_RIGHT_EYE_GL_MODELVIEW_MATRIX, rightMvMatrix);
 
-        float leftPMatrix[16];
-        ohmd_device_getf(m_ohmdDevice, OHMD_LEFT_EYE_GL_PROJECTION_MATRIX, leftPMatrix);
-        float rightPMatrix[16];
-        ohmd_device_getf(m_ohmdDevice, OHMD_RIGHT_EYE_GL_PROJECTION_MATRIX, rightPMatrix);
+        //float leftPMatrix[16];
+        //ohmd_device_getf(m_ohmdDevice, OHMD_LEFT_EYE_GL_PROJECTION_MATRIX, leftPMatrix);
+        //float rightPMatrix[16];
+        //ohmd_device_getf(m_ohmdDevice, OHMD_RIGHT_EYE_GL_PROJECTION_MATRIX, rightPMatrix);
 
-        std::unique_lock<std::mutex> guard(m_mutex);
+        ohmd_device_getf(m_ohmdDevice, OHMD_LEFT_EYE_GL_MODELVIEW_MATRIX, leftModelView.data());
+        ohmd_device_getf(m_ohmdDevice, OHMD_RIGHT_EYE_GL_MODELVIEW_MATRIX, rightModelView.data());
+
+        ohmd_device_getf(m_ohmdDevice, OHMD_LEFT_EYE_GL_PROJECTION_MATRIX, leftProjection.data());
+        ohmd_device_getf(m_ohmdDevice, OHMD_RIGHT_EYE_GL_PROJECTION_MATRIX, rightProjection.data());
+
 //        m_modelViewMatrices.first = QMatrix4x4(leftMatrix).inverted();
-        m_modelViewMatrices[0] = QMatrix4x4(leftMvMatrix).inverted();
-        m_modelViewMatrices[1] = QMatrix4x4(rightMvMatrix).inverted();
-        m_modelViewMatrices[2] = QMatrix4x4(leftPMatrix);
-        m_modelViewMatrices[3] = QMatrix4x4(rightPMatrix);
+        //m_modelViewMatrices[0] = QMatrix4x4(leftMvMatrix).inverted();
+        //m_modelViewMatrices[1] = QMatrix4x4(rightMvMatrix).inverted();
+        //m_modelViewMatrices[2] = QMatrix4x4(leftPMatrix);
+        //m_modelViewMatrices[3] = QMatrix4x4(rightPMatrix);
 //        qDebug() << m_modelViewMatrices.first;
 //        m_modelViewMatrices.second = QMatrix4x4(rightMatrix).inverted();
 
-        m_waitCondition.wait(guard);
-    }
-    ohmd_ctx_destroy(m_ohmdContext);
 }

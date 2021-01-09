@@ -8,7 +8,7 @@
 struct ohmd_context;
 struct ohmd_device;
 
-class OhmdHandler : public QThread
+class OhmdHandler : public QObject
 {
     Q_OBJECT
 
@@ -20,9 +20,13 @@ public:
 
     std::atomic_bool isRunning;
 
-    QVector<QMatrix4x4> modelViewMatrices();
+    QMatrix4x4 rightProjection;
+    QMatrix4x4 leftProjection;
 
-    void run() override;
+    QMatrix4x4 rightModelView;
+    QMatrix4x4 leftModelView;
+
+    void update();
 
     const char *distortionFragShader = nullptr;
     const char *distortionVertShader = nullptr;
@@ -43,11 +47,6 @@ public:
 private:
     ohmd_context *m_ohmdContext;
     ohmd_device *m_ohmdDevice;
-
-    std::mutex m_mutex;
-    std::condition_variable m_waitCondition;
-
-    QVector<QMatrix4x4> m_modelViewMatrices;
 };
 
 #endif // OHMDHANDLER_H
