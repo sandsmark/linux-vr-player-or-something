@@ -14,7 +14,7 @@
 
 class OhmdHandler;
 
-#define DEFAULT_FOV 90
+#define DEFAULT_FOV 80
 
 class MpvWidget Q_DECL_FINAL: public QOpenGLWindow //, protected QOpenGLFunctions
 {

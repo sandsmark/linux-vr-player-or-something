@@ -90,6 +90,7 @@ static void *get_proc_address(void *ctx, const char *name) {
 
 MpvWidget::MpvWidget() :
     m_indexBo(QOpenGLBuffer::IndexBuffer)
+    //m_cubeVbo(QOpenGLBuffer::VertexBuffer)
 {
     setFlag(Qt::Dialog);
 
@@ -186,18 +187,22 @@ void MpvWidget::initializeGL()
     }
     /* Sphere shader */
     m_sphereShader = new QOpenGLShaderProgram(this);
-//    m_sphereShader->addShaderFromSourceCode(QOpenGLShader::Vertex, m_ohmd->distortionVertShader);
-//    m_sphereShader->addShaderFromSourceCode(QOpenGLShader::Fragment, m_ohmd->distortionFragShader);
     m_sphereShader->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shader/sphere.vert");
+    const char *fragsource =
+           "#version 330\n"
+            "uniform sampler2D warpTexture;\n"
+            "in vec2 T;\n"
+           "out vec4 color;\n"
+           "void main(void)\n"
+           "{\n"
+           "    color = vec4(1.0, 1.0, 0.0, 1.0);\n"
+           "}\n";
+    //m_sphereShader->addShaderFromSourceCode(QOpenGLShader::Fragment, fragsource);
     m_sphereShader->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shader/sphere.frag");
     m_sphereShader->link();
 
     m_sphereShader->bind();
     m_sphereShader->setUniformValue("tex_uni", 0);
-
-//    m_sphereShader->setUniformValue("warpTexture", 0);
-//    m_sphereShader->setUniformValueArray("ViewportScale", m_ohmd->viewport_scale, 2, 1);
-//    m_sphereShader->setUniformValueArray("aberr", m_ohmd->aberr_scale, 3, 1);
 
     m_sphereShader->bindAttributeLocation("vertex_attr", 0);
 
@@ -213,27 +218,19 @@ void MpvWidget::initializeGL()
     nIndices = slices * stacks;
 
     m_cubeVbo.allocate(cube_vertices, sizeof(cube_vertices));
-
-    //m_indexBo.create();
-    //m_indexBo.bind();
-    //m_indexBo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    //m_indexBo.allocate(indices, sizeof(indices));
+    nIndices = sizeof(cube_vertices)/sizeof(cube_vertices[0]);
+    qDebug() << "indices" << nIndices << sizeof(cube_vertices) << sizeof(cube_vertices[0]);
+    //m_cubeVbo.release();
 
     m_sphereShader->enableAttributeArray(0);
     m_sphereShader->setAttributeBuffer(0, GL_FLOAT, 0, 3);
 
     m_sphereShader->release();
-
     m_cubeVbo.release();
     //m_indexBo.release();
     m_cubeVao.release();
 
-    //shaderProgramVideo->setAttributeBuffer(positionYCbCrLoc, GL_FLOAT, 0, 3);
 
-    //glBindBuffer(GL_ARRAY_BUFFER, sphereVbo[1]);
-    //shaderProgramVideo->setAttributeBuffer(texCoordYCbCrLoc, GL_FLOAT, 0, 2);
-
-    //glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     m_videoFbo = new QOpenGLFramebufferObject(size());
     m_videoFbo->bind();
@@ -277,7 +274,10 @@ void MpvWidget::paintGL()
 
     makeCurrent();
     glClear(GL_COLOR_BUFFER_BIT);
+    //glEnable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
+    //glDisable(GL_BLEND);
+    //glDepthMask(GL_FALSE);
 
     renderEye(0, m_ohmd->modelView[0], m_ohmd->projection[0]);
     renderEye(1, m_ohmd->modelView[1], m_ohmd->projection[1]);
@@ -436,14 +436,21 @@ void MpvWidget::renderEye(int eye, const QMatrix4x4 &modelview, QMatrix4x4 proje
     int w = width();
     int h = height();
 
-    glViewport(eye == 1 ? w/2 : 0, 0, w/2, h);
+    int eye_inv = invert_stereo ? 1 - eye : eye;
+
+    if (eye_inv == 1) {
+        glViewport(w/2, 0, w/2, h);
+    } else {
+        glViewport(0, 0, w/2, h);
+    }
 
     m_sphereShader->bind();
 
     QMatrix4x4 projection;
-    projection.perspective(m_fieldOfView, ((float)(w/2.2)) / (float)h, 0.1f, 100.0f);
+    projection.perspective(m_fieldOfView, ((float)(w/2)) / (float)h, 0.1f, 1000.0f);
     projection.rotate(m_rotHor, QVector3D(0, 1, 0));
     projection.rotate(m_rotVert, QVector3D(1, 0, 0));
+    //projection.translate(0, 0, -1);
 //    qDebug() << "==========" << eye << "=============";
 //    qDebug() << projection;
 //    qDebug() << projectionl;
@@ -459,8 +466,6 @@ void MpvWidget::renderEye(int eye, const QMatrix4x4 &modelview, QMatrix4x4 proje
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_videoFbo->texture());
 
-    int eye_inv = invert_stereo ? 1 - eye : eye;
-
     switch(video_projection_mode)
     {
         case Monoscopic:
@@ -474,16 +479,20 @@ void MpvWidget::renderEye(int eye, const QMatrix4x4 &modelview, QMatrix4x4 proje
             break;
         case SideBySide:
             if(eye_inv == 1) {
-                m_sphereShader->setUniformValue("min_max_uv_uni", 0.5f, 0.0f, 1.0f, 1.0f);
+                m_sphereShader->setUniformValue("min_max_uv_uni",
+                        0.5f, 0.0f,
+                        1.0f, 1.0f);
             } else {
-                m_sphereShader->setUniformValue("min_max_uv_uni", 0.0f, 0.0f, 0.5f, 1.0f);
+                m_sphereShader->setUniformValue("min_max_uv_uni",
+                        0.0f, 0.0f,
+                        0.5f, 1.0f);
             }
             break;
     }
     if (eye == 0) {
-        m_sphereShader->setUniformValue("eye_offset", -m_ohmd->horiz_sep);
+        m_sphereShader->setUniformValue("eye_offset", 0.f);//-m_ohmd->horiz_sep);
     } else {
-        m_sphereShader->setUniformValue("eye_offset", m_ohmd->horiz_sep);
+        m_sphereShader->setUniformValue("eye_offset", 0.f);//m_ohmd->horiz_sep);
     }
 
     m_sphereShader->setUniformValue("projection_angle_factor_uni", 360.0f / float(videoAngle));
@@ -503,11 +512,26 @@ void MpvWidget::renderEye(int eye, const QMatrix4x4 &modelview, QMatrix4x4 proje
         //glDrawElements(GL_TRIANGLE_STRIP, nIndices, GL_UNSIGNED_SHORT, nullptr);
         //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     m_cubeVao.bind();
-    //m_indexBo.bind();
-    //glDrawArrays(GL_TRIANGLES, 0, 6 + 6);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, nIndices);
+    glDrawArrays(GL_TRIANGLES, 0, 6 * 6);
     m_cubeVao.release();
+
     //m_indexBo.release();
+
+    //QOpenGLFunctions *f = context()->functions();
+
+    //qDebug() << "getting";
+    //int vertexattr = m_sphereShader->attributeLocation("vertex_attr");
+    //qDebug() << vertexattr;
+    ////m_sphereShader->enableAttributeArray(vertexattr);
+    //m_cubeVbo.bind();
+    //qDebug() << "bound";
+    //f->glEnableVertexAttribArray(vertexattr);
+    //f->glVertexAttribPointer(vertexattr, 3, GL_FLOAT, 0, 0, 0);
+    ////m_sphereShader->setAttributeBuffer(vertexattr, GL_FLOAT, 0, 3);
+    //qDebug() << "drawing";
+    //glDrawArrays(GL_TRIANGLE_FAN, 0, nIndices);
+    //qDebug() << "releasing";
+    //m_cubeVbo.release();
 
     m_sphereShader->release();
 
