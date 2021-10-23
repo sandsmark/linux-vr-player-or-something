@@ -10,6 +10,7 @@
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
 #include <QOpenGLFramebufferObject>
+#include <QTimer>
 
 class OhmdHandler;
 
@@ -49,6 +50,7 @@ protected:
 private Q_SLOTS:
     void maybeUpdate();
     void onScreenAdded();
+    void resizeFbo();
 
 private:
     void renderEye(int eye, const QMatrix4x4 &modelview, QMatrix4x4 projection);
@@ -78,11 +80,17 @@ private:
     const char *m_path = nullptr;
 
     QImage m_posImage;
+
+
+    QTimer m_updateFboTimer;
+    int m_videoWidth = 0;
+    int m_videoHeight = 0;
+    GLint m_maxTextureSize = 512;
+
     //QPainterPath m_posString;
     //QPainterPath m_posStringStroke;
 
 protected:
-    void resizeGL(int w, int h) override;
     void keyPressEvent(QKeyEvent *event) override;
     quint32 sphereVbo[3];
     quint32 nIndices;

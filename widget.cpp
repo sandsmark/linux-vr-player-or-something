@@ -120,11 +120,19 @@ MpvWidget::MpvWidget() :
 
     mpv_observe_property(m_mpv, 0, "duration", MPV_FORMAT_DOUBLE);
     mpv_observe_property(m_mpv, 0, "playback-time", MPV_FORMAT_DOUBLE);
+    mpv_observe_property(m_mpv, 0, "width", MPV_FORMAT_INT64);
+    mpv_observe_property(m_mpv, 0, "height", MPV_FORMAT_INT64);
     mpv_set_wakeup_callback(m_mpv, wakeup, this);
+
+    m_updateFboTimer.setSingleShot(true);
+    m_updateFboTimer.setInterval(10);
+    connect(&m_updateFboTimer, &QTimer::timeout, this, &MpvWidget::resizeFbo);
 
     m_ohmd = new OhmdHandler(this);
 
     connect(qGuiApp, &QGuiApplication::screenAdded, this, &MpvWidget::onScreenAdded);
+
+    setMinimumSize(QSize(640, 480));
 }
 
 MpvWidget::~MpvWidget()
@@ -170,6 +178,8 @@ void MpvWidget::initializeGL()
 {
     glEnable (GL_DEBUG_OUTPUT);
     QOpenGLExtraFunctions(context()).glDebugMessageCallback(s_messageCallback, 0);
+
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &m_maxTextureSize);
 
     for (const QScreen *screen : qApp->screens()) {
         qDebug() << "during init" << screen->refreshRate() << screen->size();
@@ -312,7 +322,6 @@ void MpvWidget::on_mpv_events()
 
 void MpvWidget::handle_mpv_event(mpv_event *event)
 {
-    return;
     switch (event->event_id) {
     case MPV_EVENT_PROPERTY_CHANGE: {
         mpv_event_property *prop = (mpv_event_property *)event->data;
@@ -334,6 +343,18 @@ void MpvWidget::handle_mpv_event(mpv_event *event)
                 m_duration = time;
                 Q_EMIT durationChanged(time);
             }
+        } else if (strcmp(prop->name, "width") == 0) {
+            if (prop->format != MPV_FORMAT_INT64) {
+                return;
+            }
+            m_videoWidth = (*(int64_t *)prop->data);
+            m_updateFboTimer.start();
+        } else if (strcmp(prop->name, "height") == 0) {
+            if (prop->format != MPV_FORMAT_INT64) {
+                return;
+            }
+            m_videoHeight = (*(int64_t *)prop->data);
+            m_updateFboTimer.start();
         } else {
             return;
         }
@@ -497,10 +518,23 @@ void MpvWidget::on_update(void *ctx)
     QMetaObject::invokeMethod((MpvWidget*)ctx, "maybeUpdate");
 }
 
-void MpvWidget::resizeGL(int w, int h)
+void MpvWidget::resizeFbo()
 {
+    if (m_videoWidth <= 0 || m_videoHeight <= 0) {
+        return;
+    }
+    QSize videoSize(m_videoWidth, m_videoHeight);
+    qDebug() << m_maxTextureSize;
+    if (m_videoWidth > m_maxTextureSize || m_videoHeight > m_maxTextureSize) {
+        QSize maxSize(m_maxTextureSize, m_maxTextureSize);
+        videoSize = videoSize.scaled(maxSize, Qt::KeepAspectRatio);
+    }
+    if (m_videoFbo->size() == videoSize) {
+        return;
+    }
+    qDebug() << "new size" << videoSize;
     delete m_videoFbo;
-    m_videoFbo = new QOpenGLFramebufferObject(w, h);
+    m_videoFbo = new QOpenGLFramebufferObject(videoSize);
 }
 
 void MpvWidget::keyPressEvent(QKeyEvent *event)
