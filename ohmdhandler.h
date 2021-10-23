@@ -23,8 +23,8 @@ public:
     QMatrix4x4 rightProjection;
     QMatrix4x4 leftProjection;
 
-    QMatrix4x4 rightModelView;
-    QMatrix4x4 leftModelView;
+    QMatrix4x4 modelView[2];
+    QMatrix4x4 projection[2];
 
     void update();
 

@@ -113,16 +113,22 @@ void OhmdHandler::update()
 
         ohmd_ctx_update(m_ohmdContext);
 
-        //float leftPMatrix[16];
-        //ohmd_device_getf(m_ohmdDevice, OHMD_LEFT_EYE_GL_PROJECTION_MATRIX, leftPMatrix);
-        //float rightPMatrix[16];
-        //ohmd_device_getf(m_ohmdDevice, OHMD_RIGHT_EYE_GL_PROJECTION_MATRIX, rightPMatrix);
+        float matrix[16];
+        ohmd_device_getf(m_ohmdDevice, OHMD_LEFT_EYE_GL_MODELVIEW_MATRIX, matrix);
+        modelView[0] = QMatrix4x4(matrix).inverted();
 
-        ohmd_device_getf(m_ohmdDevice, OHMD_LEFT_EYE_GL_MODELVIEW_MATRIX, leftModelView.data());
-        ohmd_device_getf(m_ohmdDevice, OHMD_RIGHT_EYE_GL_MODELVIEW_MATRIX, rightModelView.data());
+        ohmd_device_getf(m_ohmdDevice, OHMD_RIGHT_EYE_GL_MODELVIEW_MATRIX, matrix);
+        modelView[1] = QMatrix4x4(matrix).inverted();
 
-        ohmd_device_getf(m_ohmdDevice, OHMD_LEFT_EYE_GL_PROJECTION_MATRIX, leftProjection.data());
-        ohmd_device_getf(m_ohmdDevice, OHMD_RIGHT_EYE_GL_PROJECTION_MATRIX, rightProjection.data());
+        ohmd_device_getf(m_ohmdDevice, OHMD_LEFT_EYE_GL_PROJECTION_MATRIX, matrix);
+        projection[0] = QMatrix4x4(matrix).inverted();
+        ohmd_device_getf(m_ohmdDevice, OHMD_RIGHT_EYE_GL_PROJECTION_MATRIX, matrix);
+        projection[1] = QMatrix4x4(matrix).inverted();
+
+        //ohmd_device_getf(m_ohmdDevice, OHMD_RIGHT_EYE_GL_MODELVIEW_MATRIX, modelView[1].data());
+
+        //ohmd_device_getf(m_ohmdDevice, OHMD_LEFT_EYE_GL_PROJECTION_MATRIX, projection[0].data());
+        //ohmd_device_getf(m_ohmdDevice, OHMD_RIGHT_EYE_GL_PROJECTION_MATRIX, projection[1].data());
 
 //        m_modelViewMatrices.first = QMatrix4x4(leftMatrix).inverted();
         //m_modelViewMatrices[0] = QMatrix4x4(leftMvMatrix).inverted();

@@ -116,7 +116,7 @@ MpvWidget::MpvWidget() :
     const QString watchLaterDir = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + "/mpv/watch_later/";
     mpv_set_option_string(m_mpv, "watch-later-directory", watchLaterDir.toUtf8().constData());
 
-    mpv::qt::set_option_variant(m_mpv, "hwdec", "auto");
+    //mpv::qt::set_option_variant(m_mpv, "hwdec", "auto");
 
     mpv_observe_property(m_mpv, 0, "duration", MPV_FORMAT_DOUBLE);
     mpv_observe_property(m_mpv, 0, "playback-time", MPV_FORMAT_DOUBLE);
@@ -269,9 +269,8 @@ void MpvWidget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT);
     glDisable(GL_DEPTH_TEST);
 
-    QVector<QMatrix4x4> matrices = m_ohmd->modelViewMatrices();
-    renderEye(0, matrices[0], matrices[2]);
-    renderEye(1, matrices[1], matrices[3]);
+    renderEye(0, m_ohmd->modelView[0], m_ohmd->projection[0]);
+    renderEye(1, m_ohmd->modelView[1], m_ohmd->projection[1]);
 
     makeCurrent();
 
