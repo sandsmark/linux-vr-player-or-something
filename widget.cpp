@@ -466,6 +466,11 @@ void MpvWidget::renderEye(int eye, const QMatrix4x4 &modelview, QMatrix4x4 proje
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_videoFbo->texture());
 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+
     switch(video_projection_mode)
     {
         case Monoscopic:
