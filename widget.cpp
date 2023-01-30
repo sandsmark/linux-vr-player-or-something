@@ -18,61 +18,62 @@
 
 /********************/
 
-static const QVector3D cube_vertices[] = {
-        // back
-        QVector3D(-1.0f,  1.0f, -1.0f),
-        QVector3D(-1.0f, -1.0f, -1.0f),
-        QVector3D( 1.0f, -1.0f, -1.0f),
+static const QVector3D cube_vertices[] =
+{
+    // back
+    QVector3D(-1.0f,  1.0f, -1.0f),
+    QVector3D(-1.0f, -1.0f, -1.0f),
+    QVector3D( 1.0f, -1.0f, -1.0f),
 
-        QVector3D( 1.0f, -1.0f, -1.0f),
-        QVector3D( 1.0f,  1.0f, -1.0f),
-        QVector3D(-1.0f,  1.0f, -1.0f),
+    QVector3D( 1.0f, -1.0f, -1.0f),
+    QVector3D( 1.0f,  1.0f, -1.0f),
+    QVector3D(-1.0f,  1.0f, -1.0f),
 
-        // front
-        QVector3D( 1.0f,  1.0f,  1.0f),
-        QVector3D( 1.0f, -1.0f,  1.0f),
-        QVector3D(-1.0f, -1.0f,  1.0f),
+    // front
+    QVector3D( 1.0f,  1.0f,  1.0f),
+    QVector3D( 1.0f, -1.0f,  1.0f),
+    QVector3D(-1.0f, -1.0f,  1.0f),
 
-        QVector3D(-1.0f, -1.0f,  1.0f),
-        QVector3D(-1.0f,  1.0f,  1.0f),
-        QVector3D( 1.0f,  1.0f,  1.0f),
+    QVector3D(-1.0f, -1.0f,  1.0f),
+    QVector3D(-1.0f,  1.0f,  1.0f),
+    QVector3D( 1.0f,  1.0f,  1.0f),
 
-        // left
-        QVector3D(-1.0f,  1.0f,  1.0f),
-        QVector3D(-1.0f, -1.0f,  1.0f),
-        QVector3D(-1.0f, -1.0f, -1.0f),
+    // left
+    QVector3D(-1.0f,  1.0f,  1.0f),
+    QVector3D(-1.0f, -1.0f,  1.0f),
+    QVector3D(-1.0f, -1.0f, -1.0f),
 
-        QVector3D(-1.0f, -1.0f, -1.0f),
-        QVector3D(-1.0f,  1.0f, -1.0f),
-        QVector3D(-1.0f,  1.0f,  1.0f),
+    QVector3D(-1.0f, -1.0f, -1.0f),
+    QVector3D(-1.0f,  1.0f, -1.0f),
+    QVector3D(-1.0f,  1.0f,  1.0f),
 
-        // right
-        QVector3D( 1.0f,  1.0f, -1.0f),
-        QVector3D( 1.0f, -1.0f, -1.0f),
-        QVector3D( 1.0f, -1.0f,  1.0f),
+    // right
+    QVector3D( 1.0f,  1.0f, -1.0f),
+    QVector3D( 1.0f, -1.0f, -1.0f),
+    QVector3D( 1.0f, -1.0f,  1.0f),
 
-        QVector3D( 1.0f, -1.0f,  1.0f),
-        QVector3D( 1.0f,  1.0f,  1.0f),
-        QVector3D( 1.0f,  1.0f, -1.0f),
+    QVector3D( 1.0f, -1.0f,  1.0f),
+    QVector3D( 1.0f,  1.0f,  1.0f),
+    QVector3D( 1.0f,  1.0f, -1.0f),
 
-        // top
-        QVector3D(-1.0f,  1.0f, -1.0f),
-        QVector3D( 1.0f,  1.0f, -1.0f),
-        QVector3D( 1.0f,  1.0f,  1.0f),
+    // top
+    QVector3D(-1.0f,  1.0f, -1.0f),
+    QVector3D( 1.0f,  1.0f, -1.0f),
+    QVector3D( 1.0f,  1.0f,  1.0f),
 
-        QVector3D( 1.0f,  1.0f,  1.0f),
-        QVector3D(-1.0f,  1.0f,  1.0f),
-        QVector3D(-1.0f,  1.0f, -1.0f),
+    QVector3D( 1.0f,  1.0f,  1.0f),
+    QVector3D(-1.0f,  1.0f,  1.0f),
+    QVector3D(-1.0f,  1.0f, -1.0f),
 
-        // bottom
-        QVector3D( 1.0f, -1.0f, -1.0f),
-        QVector3D(-1.0f, -1.0f, -1.0f),
-        QVector3D(-1.0f, -1.0f,  1.0f),
+    // bottom
+    QVector3D( 1.0f, -1.0f, -1.0f),
+    QVector3D(-1.0f, -1.0f, -1.0f),
+    QVector3D(-1.0f, -1.0f,  1.0f),
 
-        QVector3D(-1.0f, -1.0f,  1.0f),
-        QVector3D( 1.0f, -1.0f,  1.0f),
-        QVector3D( 1.0f, -1.0f, -1.0f)
-    };
+    QVector3D(-1.0f, -1.0f,  1.0f),
+    QVector3D( 1.0f, -1.0f,  1.0f),
+    QVector3D( 1.0f, -1.0f, -1.0f)
+};
 
 /***************************************/
 static void wakeup(void *ctx)
@@ -80,7 +81,8 @@ static void wakeup(void *ctx)
     QMetaObject::invokeMethod((MpvWidget*)ctx, &MpvWidget::on_mpv_events, Qt::QueuedConnection);
 }
 
-static void *get_proc_address(void *ctx, const char *name) {
+static void *get_proc_address(void *ctx, const char *name)
+{
     Q_UNUSED(ctx);
     QOpenGLContext *glctx = QOpenGLContext::currentContext();
     if (!glctx)
@@ -148,11 +150,14 @@ void MpvWidget::play(const char *path)
 {
     m_path = path;
 
-    if (m_mpvGl) {
+    if (m_mpvGl)
+    {
         const char *args[] = {"loadfile", path, NULL};
         mpv_command(m_mpv, args);
         m_path = nullptr;
-    } else {
+    }
+    else
+    {
         qWarning() << "init gl not done yet";
     }
 }
@@ -160,19 +165,20 @@ void MpvWidget::play(const char *path)
 /*
  * Data used to seed our vertex array and element array buffers:
  */
-static const GLfloat g_vertex_buffer_data[] = {
+static const GLfloat g_vertex_buffer_data[] =
+{
     -1.0f, -1.0f,
-     1.0f, -1.0f,
-    -1.0f,  1.0f,
-     1.0f,  1.0f
-};
+        1.0f, -1.0f,
+        -1.0f,  1.0f,
+        1.0f,  1.0f
+    };
 static const GLushort g_element_buffer_data[] = { 0, 1, 2, 3 };
 
 void GLAPIENTRY s_messageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 {
-  fprintf( stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-           ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
-            type, severity, message );
+    fprintf( stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+             ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
+             type, severity, message );
 }
 
 void MpvWidget::initializeGL()
@@ -182,21 +188,22 @@ void MpvWidget::initializeGL()
 
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &m_maxTextureSize);
 
-    for (const QScreen *screen : qApp->screens()) {
+    for (const QScreen *screen : qApp->screens())
+    {
         qDebug() << "during init" << screen->refreshRate() << screen->size();
     }
     /* Sphere shader */
     m_sphereShader = new QOpenGLShaderProgram(this);
     m_sphereShader->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shader/sphere.vert");
     const char *fragsource =
-           "#version 330\n"
-            "uniform sampler2D warpTexture;\n"
-            "in vec2 T;\n"
-           "out vec4 color;\n"
-           "void main(void)\n"
-           "{\n"
-           "    color = vec4(1.0, 1.0, 0.0, 1.0);\n"
-           "}\n";
+        "#version 330\n"
+        "uniform sampler2D warpTexture;\n"
+        "in vec2 T;\n"
+        "out vec4 color;\n"
+        "void main(void)\n"
+        "{\n"
+        "    color = vec4(1.0, 1.0, 0.0, 1.0);\n"
+        "}\n";
     //m_sphereShader->addShaderFromSourceCode(QOpenGLShader::Fragment, fragsource);
     m_sphereShader->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shader/sphere.frag");
     m_sphereShader->link();
@@ -235,8 +242,9 @@ void MpvWidget::initializeGL()
     m_videoFbo = new QOpenGLFramebufferObject(size());
     m_videoFbo->bind();
 
-    mpv_opengl_init_params gl_init_params{get_proc_address, nullptr, nullptr};
-    mpv_render_param params[]{
+    mpv_opengl_init_params gl_init_params{get_proc_address, nullptr};
+    mpv_render_param params[]
+    {
         {MPV_RENDER_PARAM_API_TYPE, const_cast<char *>(MPV_RENDER_API_TYPE_OPENGL)},
         {MPV_RENDER_PARAM_OPENGL_INIT_PARAMS, &gl_init_params},
         {MPV_RENDER_PARAM_INVALID, nullptr}
@@ -246,7 +254,8 @@ void MpvWidget::initializeGL()
         throw std::runtime_error("failed to initialize mpv GL context");
     mpv_render_context_set_update_callback(m_mpvGl, MpvWidget::on_update, reinterpret_cast<void *>(this));
 
-    if (m_path) {
+    if (m_path)
+    {
         const char *args[] = {"loadfile", m_path, NULL};
         mpv_command(m_mpv, args);
         m_path = nullptr;
@@ -255,14 +264,16 @@ void MpvWidget::initializeGL()
 
 void MpvWidget::paintGL()
 {
-    if (!m_videoFbo) {
+    if (!m_videoFbo)
+    {
         return;
     }
 
     mpv_opengl_fbo mpfbo{static_cast<int>(m_videoFbo->handle()), m_videoFbo->width(), m_videoFbo->height(), GL_RGBA8};
     int flip_y{0};
 
-    mpv_render_param params[] = {
+    mpv_render_param params[] =
+    {
         {MPV_RENDER_PARAM_OPENGL_FBO, &mpfbo},
         {MPV_RENDER_PARAM_FLIP_Y, &flip_y},
         {MPV_RENDER_PARAM_INVALID, nullptr}
@@ -311,9 +322,11 @@ void MpvWidget::showEvent(QShowEvent *e)
 void MpvWidget::on_mpv_events()
 {
     // Process all events, until the event queue is empty.
-    while (m_mpv) {
+    while (m_mpv)
+    {
         mpv_event *event = mpv_wait_event(m_mpv, 0);
-        if (event->event_id == MPV_EVENT_NONE) {
+        if (event->event_id == MPV_EVENT_NONE)
+        {
             break;
         }
         handle_mpv_event(event);
@@ -322,45 +335,63 @@ void MpvWidget::on_mpv_events()
 
 void MpvWidget::handle_mpv_event(mpv_event *event)
 {
-    switch (event->event_id) {
-    case MPV_EVENT_PROPERTY_CHANGE: {
+    switch (event->event_id)
+    {
+    case MPV_EVENT_PROPERTY_CHANGE:
+    {
         mpv_event_property *prop = (mpv_event_property *)event->data;
-        if (strcmp(prop->name, "playback-time") == 0) {
-            if (prop->format == MPV_FORMAT_DOUBLE) {
+        if (strcmp(prop->name, "playback-time") == 0)
+        {
+            if (prop->format == MPV_FORMAT_DOUBLE)
+            {
                 int time = (*(double *)prop->data) * 1000;
-                if (time == m_position) {
+                if (time == m_position)
+                {
                     return;
                 }
                 m_position = time;
                 Q_EMIT positionChanged(time);
             }
-        } else if (strcmp(prop->name, "duration") == 0) {
-            if (prop->format == MPV_FORMAT_DOUBLE) {
+        }
+        else if (strcmp(prop->name, "duration") == 0)
+        {
+            if (prop->format == MPV_FORMAT_DOUBLE)
+            {
                 int time = (*(double *)prop->data) * 1000.;
-                if (time == m_duration) {
+                if (time == m_duration)
+                {
                     return;
                 }
                 m_duration = time;
                 Q_EMIT durationChanged(time);
             }
-        } else if (strcmp(prop->name, "width") == 0) {
-            if (prop->format != MPV_FORMAT_INT64) {
+        }
+        else if (strcmp(prop->name, "width") == 0)
+        {
+            if (prop->format != MPV_FORMAT_INT64)
+            {
                 return;
             }
             m_videoWidth = (*(int64_t *)prop->data);
             m_updateFboTimer.start();
-        } else if (strcmp(prop->name, "height") == 0) {
-            if (prop->format != MPV_FORMAT_INT64) {
+        }
+        else if (strcmp(prop->name, "height") == 0)
+        {
+            if (prop->format != MPV_FORMAT_INT64)
+            {
                 return;
             }
             m_videoHeight = (*(int64_t *)prop->data);
             m_updateFboTimer.start();
-        } else {
+        }
+        else
+        {
             return;
         }
         break;
     }
-    default: ;
+    default:
+        ;
         return;
     }
 //    QString posString = QTime::fromMSecsSinceStartOfDay(m_position).toString() + "/" + QTime::fromMSecsSinceStartOfDay(m_duration).toString();
@@ -399,28 +430,33 @@ void MpvWidget::maybeUpdate()
 //        context()->swapBuffers(context()->surface());
 //        doneCurrent();
 //    } else {
-        update();
-        //    }
+    update();
+    //    }
 }
 
 void MpvWidget::onScreenAdded()
 {
     // quick hack to try to position into the correct display
-    if (m_ohmd->displaySize.isEmpty()) {
+    if (m_ohmd->displaySize.isEmpty())
+    {
         qWarning() << "Display size not fetched!";
         return;
     }
 
-    if (screen()->size() == m_ohmd->displaySize) {
+    if (screen()->size() == m_ohmd->displaySize)
+    {
         qDebug() << "Already correct size";
         return;
     }
 
-    for (QScreen *other : qApp->screens()) {
-        if (other == screen()) {
+    for (QScreen *other : qApp->screens())
+    {
+        if (other == screen())
+        {
             continue;
         }
-        if (other->size() == m_ohmd->displaySize) {
+        if (other->size() == m_ohmd->displaySize)
+        {
             qDebug() << "Moving from" << screen() << "to" << other->geometry() << geometry();
             disconnect(qGuiApp, &QGuiApplication::screenAdded, this, &MpvWidget::onScreenAdded);
             setGeometry(other->geometry());
@@ -438,9 +474,12 @@ void MpvWidget::renderEye(int eye, const QMatrix4x4 &modelview, QMatrix4x4 proje
 
     int eye_inv = invert_stereo ? 1 - eye : eye;
 
-    if (eye_inv == 1) {
+    if (eye_inv == 1)
+    {
         glViewport(w/2, 0, w/2, h);
-    } else {
+    }
+    else
+    {
         glViewport(0, 0, w/2, h);
     }
 
@@ -473,30 +512,36 @@ void MpvWidget::renderEye(int eye, const QMatrix4x4 &modelview, QMatrix4x4 proje
 
     switch(video_projection_mode)
     {
-        case Monoscopic:
-            m_sphereShader->setUniformValue("min_max_uv_uni", 0.0f, 0.0f, 1.0f, 1.0f);
-            break;
-        case OverUnder:
-            if(eye_inv == 1)
-                m_sphereShader->setUniformValue("min_max_uv_uni", 0.0f, 0.5f, 1.0f, 1.0f);
-            else
-                m_sphereShader->setUniformValue("min_max_uv_uni", 0.0f, 0.0f, 1.0f, 0.5f);
-            break;
-        case SideBySide:
-            if(eye_inv == 1) {
-                m_sphereShader->setUniformValue("min_max_uv_uni",
-                        0.5f, 0.0f,
-                        1.0f, 1.0f);
-            } else {
-                m_sphereShader->setUniformValue("min_max_uv_uni",
-                        0.0f, 0.0f,
-                        0.5f, 1.0f);
-            }
-            break;
+    case Monoscopic:
+        m_sphereShader->setUniformValue("min_max_uv_uni", 0.0f, 0.0f, 1.0f, 1.0f);
+        break;
+    case OverUnder:
+        if(eye_inv == 1)
+            m_sphereShader->setUniformValue("min_max_uv_uni", 0.0f, 0.5f, 1.0f, 1.0f);
+        else
+            m_sphereShader->setUniformValue("min_max_uv_uni", 0.0f, 0.0f, 1.0f, 0.5f);
+        break;
+    case SideBySide:
+        if(eye_inv == 1)
+        {
+            m_sphereShader->setUniformValue("min_max_uv_uni",
+                                            0.5f, 0.0f,
+                                            1.0f, 1.0f);
+        }
+        else
+        {
+            m_sphereShader->setUniformValue("min_max_uv_uni",
+                                            0.0f, 0.0f,
+                                            0.5f, 1.0f);
+        }
+        break;
     }
-    if (eye == 0) {
+    if (eye == 0)
+    {
         m_sphereShader->setUniformValue("eye_offset", 0.f);//-m_ohmd->horiz_sep);
-    } else {
+    }
+    else
+    {
         m_sphereShader->setUniformValue("eye_offset", 0.f);//m_ohmd->horiz_sep);
     }
 
@@ -513,9 +558,9 @@ void MpvWidget::renderEye(int eye, const QMatrix4x4 &modelview, QMatrix4x4 proje
     //glVertex3d(  -1,  1, 0);
     //glEnd();
 
-        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphereVbo[2]);
-        //glDrawElements(GL_TRIANGLE_STRIP, nIndices, GL_UNSIGNED_SHORT, nullptr);
-        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphereVbo[2]);
+    //glDrawElements(GL_TRIANGLE_STRIP, nIndices, GL_UNSIGNED_SHORT, nullptr);
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     m_cubeVao.bind();
     glDrawArrays(GL_TRIANGLES, 0, 6 * 6);
     m_cubeVao.release();
@@ -549,16 +594,19 @@ void MpvWidget::on_update(void *ctx)
 
 void MpvWidget::resizeFbo()
 {
-    if (m_videoWidth <= 0 || m_videoHeight <= 0) {
+    if (m_videoWidth <= 0 || m_videoHeight <= 0)
+    {
         return;
     }
     QSize videoSize(m_videoWidth, m_videoHeight);
     qDebug() << m_maxTextureSize;
-    if (m_videoWidth > m_maxTextureSize || m_videoHeight > m_maxTextureSize) {
+    if (m_videoWidth > m_maxTextureSize || m_videoHeight > m_maxTextureSize)
+    {
         QSize maxSize(m_maxTextureSize, m_maxTextureSize);
         videoSize = videoSize.scaled(maxSize, Qt::KeepAspectRatio);
     }
-    if (m_videoFbo->size() == videoSize) {
+    if (m_videoFbo->size() == videoSize)
+    {
         return;
     }
     qDebug() << "new size" << videoSize;
@@ -568,45 +616,55 @@ void MpvWidget::resizeFbo()
 
 void MpvWidget::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_Plus || event->key() == Qt::Key_Equal) {
+    if (event->key() == Qt::Key_Plus || event->key() == Qt::Key_Equal)
+    {
         m_fieldOfView-= 10;
-        if (m_fieldOfView < 45) {
+        if (m_fieldOfView < 45)
+        {
             m_fieldOfView = 45;
         }
         return;
     }
-    if (event->key() == Qt::Key_Minus) {
+    if (event->key() == Qt::Key_Minus)
+    {
         m_fieldOfView += 10;
-        if (m_fieldOfView > 150) {
+        if (m_fieldOfView > 150)
+        {
             m_fieldOfView = 150;
         }
         return;
     }
-    if (event->key() == Qt::Key_Escape) {
+    if (event->key() == Qt::Key_Escape)
+    {
         m_rotVert = 0;
         m_rotHor = 0;
         m_fieldOfView = DEFAULT_FOV;
         return;
     }
 
-    if (event->key() == Qt::Key_W) {
+    if (event->key() == Qt::Key_W)
+    {
         m_rotVert--;
         return;
     }
-    if (event->key() == Qt::Key_S) {
+    if (event->key() == Qt::Key_S)
+    {
         m_rotVert++;
         return;
     }
-    if (event->key() == Qt::Key_A) {
+    if (event->key() == Qt::Key_A)
+    {
         m_rotHor--;
         return;
     }
-    if (event->key() == Qt::Key_D) {
+    if (event->key() == Qt::Key_D)
+    {
         m_rotHor++;
         return;
     }
 
-    if (event->key() == Qt::Key_Q) {
+    if (event->key() == Qt::Key_Q)
+    {
         close();
         return;
     }
@@ -614,30 +672,36 @@ void MpvWidget::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_Shift ||
             event->key() == Qt::Key_Control ||
             event->key() == Qt::Key_Meta ||
-            event->key() == Qt::Key_Alt) {
+            event->key() == Qt::Key_Alt)
+    {
         return;
     }
 
     const QString sequenceString = QKeySequence(event->key() + event->modifiers()).toString();
-    for (const QChar &c : sequenceString) {
-        if (!c.isPrint()) {
+    for (const QChar &c : sequenceString)
+    {
+        if (!c.isPrint())
+        {
             return;
         }
     }
 
     QByteArray keyString = sequenceString.toLower().toUtf8();
 
-    const QHash<QByteArray, QByteArray> mpvMapping({
-                                                       {"pgdown", "pgdwn"},
-                                                       {"backspace", "bs"},
-                                                       {"return", "enter"},
-                                                   });
+    const QHash<QByteArray, QByteArray> mpvMapping(
+    {
+        {"pgdown", "pgdwn"},
+        {"backspace", "bs"},
+        {"return", "enter"},
+    });
 
-    if (mpvMapping.contains(keyString)) {
+    if (mpvMapping.contains(keyString))
+    {
         keyString = mpvMapping[keyString];
     }
 
-    if (keyString.endsWith('+')) {
+    if (keyString.endsWith('+'))
+    {
         keyString.chop(1);
     }
 
